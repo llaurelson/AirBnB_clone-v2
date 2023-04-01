@@ -16,8 +16,10 @@ from models.city import City
 
 import shlex
 
+
 class State(BaseModel, Base):
 
+    
     """This is the class for State
 
     Attributes:
@@ -35,7 +37,6 @@ class State(BaseModel, Base):
                           backref="state")
 
     @property
-
     def cities(self):
 
         var = models.storage.all()
