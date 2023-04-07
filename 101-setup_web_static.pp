@@ -1,7 +1,6 @@
 # puppet manifest preparing a server for static content deployment
 exec { 'apt-get-update':
   command => '/usr/bin/env apt-get -y update',
-}
 -> exec {'b':
   command => '/usr/bin/env apt-get -y install nginx',
 }
@@ -25,4 +24,5 @@ exec { 'apt-get-update':
 }
 -> exec {'g':
   command => '/usr/bin/env chown -R ubuntu:ubuntu /data',
+}
 }
