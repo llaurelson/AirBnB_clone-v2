@@ -46,3 +46,4 @@ file_line { 'ADDING A LOCATION':
   require => Package['nginx'],
   notify  => Service['nginx'],
 }
+
