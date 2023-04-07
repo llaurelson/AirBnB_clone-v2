@@ -1,103 +1,44 @@
 #!/usr/bin/python3
-
-"""
-
-Distributes archived pack to both web serversw
-
-"""
-
+# Fabfile to distribute an archive to a web server.
 import os.path
-
-import fabric
-
-from fabric.api import env, put, run
-
-env.user = "ubuntu"
-
-env.hosts = ["34.207.120.17", "18.209.179.25"]
-
+from fabric.api import env
+from fabric.api import put
+from fabric.api import run
+env.hosts =["34.207.120.17", "18.209.179.25"]
 def do_deploy(archive_path):
-
     """Distributes an archive to a web server.
-
+    Args:
+        archive_path (str): The path of the archive to distribute.
+    Returns:
+        If the file doesn't exist at archive_path or an error occurs - False.
+        Otherwise - True.
     """
-
     if os.path.isfile(archive_path) is False:
-
         return False
-
-    fullFile = archive_path.split("/")[-1]
-
-    folder = fullFile.split(".")[0]
-
-    if put(archive_path, "/tmp/{}".format(fullFile)).failed is True:
-
-        print("Uploading archive to /tmp/ failed")
-
+    file = archive_path.split("/")[-1]
+    name = file.split(".")[0]
+    if put(archive_path, "/tmp/{}".format(file)).failed is True:
         return False
-
     if run("rm -rf /data/web_static/releases/{}/".
-
-           format(folder)).failed is True:
-
-        print("Deleting folder with archive(if already exists) failed")
-
+           format(name)).failed is True:
         return False
-
     if run("mkdir -p /data/web_static/releases/{}/".
-
-           format(folder)).failed is True:
-
-        print("Creating new archive folder failed")
-
+           format(name)).failed is True:
         return False
-
     if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
-
-           format(fullFile, folder)).failed is True:
-
-        print("Uncompressing archive to failed")
-
+           format(file, name)).failed is True:
         return False
-
-    if run("rm /tmp/{}".format(fullFile)).failed is True:
-
-        print("Deleting archive from /tmp/ directory dailed")
-
+    if run("rm /tmp/{}".format(file)).failed is True:
         return False
-
     if run("mv /data/web_static/releases/{}/web_static/* "
-
-           "/data/web_static/releases/{}/".
-
-           format(folder, folder)).failed is True:
-
-        print("Moving content to archive folder before deletion failed")
-
+           "/data/web_static/releases/{}/".format(name, name)).failed is True:
         return False
-
     if run("rm -rf /data/web_static/releases/{}/web_static".
-
-           format(folder)).failed is True:
-
-        print("Deleting web_static folder failed")
-
+           format(name)).failed is True:
         return False
-
     if run("rm -rf /data/web_static/current").failed is True:
-
-        print("Deleting 'current' folder failed")
-
         return False
-
     if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
-
-           format(folder)).failed is True:
-
-        print("Creating new symbolic link to new code version failed")
-
+           format(name)).failed is True:
         return False
-
-    print("New version deployed!")
-
     return True
